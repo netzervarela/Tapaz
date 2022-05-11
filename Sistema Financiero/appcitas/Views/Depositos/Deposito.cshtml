@@ -1,0 +1,319 @@
+﻿
+@{
+    //ViewBag.Title = "Deposito";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var ClienteId = Request.Url.Segments.Last();
+    ViewBag.Title = "Depositos";
+    ViewBag.TipoId = ClienteId;
+}
+
+<div class="box bac">
+    <div class="box-header">
+        <h3 class="titulo">Listado de Depositos a Plazo Fijo</h3>
+        <div class="row nomargin">
+            <div class="col-md-3">
+                <button class="btn btn-md btn-success" id="btn_nuevo_Deposito" onclick="NuevoDeposito(event)">
+                    <i class="fa fa-plus"> </i>
+                    <span> Nuevo Deposito</span>
+                </button>
+            </div>
+            <div class="col-md-3 col-md-offset-6" align="right">
+                <button class="btn btn-md btn-warning" id="btn_regresar" onclick="location.href='/Clientes/Clientes'">
+                    <i class="fa fa-arrow-left"> </i>
+                    <span> Regresar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="box-body bac-table-panel">
+        <table id="tableRazones" class="list-table table table-bordered">
+            <thead>
+                <tr>
+                    <th>Fec Apertura</th>
+                    <th>Monto Deposito</th>
+                    <th>Plazo Meses</th>
+                    <th>Interes %</th>
+                    <th>Saldo</th>
+                    <th>Estado</th>
+                    <th>Tipo</th>
+                    <th>Acciones</th>
+                    <th hidden="hidden"></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="moda_razones" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel"><span id="theHeader">Agregar/Editar Razón</span></h4>
+            </div>
+            <div class="modal-body" id="form">
+                <input type="hidden" id="hidden_id" />
+                <input type="hidden" id="hidden_tipo_id" value="@ViewBag.TipoId" />
+
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group input-group-sm">
+                            <label for="montoDeposito">Monto Deposito</label>
+                            <input type="text" class="form-control monto requerido monto" id="montoDeposito" attr-message="Es un campo requerido!" name="montoDeposito" placeholder="Monto en Lempiras"  />
+                            <div class="validation-error"><p></p></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group input-group-sm">
+                            <label for="estado">Estado</label>
+                            <input type="text" class="form-control numero requerido" id="estado" attr-message="Es un campo requerido!" name="abreviatura" placeholder="Estado"  />
+                            <div class="validation-error"><p></p></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group input-group-sm">
+                            <label for="Tipo">Tipo de Deposito</label>
+                            @*<input onchange="shareValue(this.id, 'theSelect');" />*@
+                            <select class="selectpicker show-menu-arrow requerido" title="Seleccione" id="Tipo" attr-message="Es un campo requerido!" name="Tipo">
+                                <option value="1">DEPOSITO A PLAZO A 3 MESES</option>
+                                <option value="2">DEPOSITO A PLAZO A 6 MESES</option>
+                                <option value="3">DEPOSITO A PLAZO A 12 MESES</option>
+                                <option value="4">DEPOSITO A PLAZO A MAS DE 12 MESES</option>
+                            </select>
+                            <div class="validation-error"><p></p></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group input-group-sm">
+                            <label for="tasainteres">Tasa de Interes</label>
+                            <input type="text" class="form-control requerido monto" id="tasainteres" attr-message="Es un campo requerido!"  name="tasainteres" placeholder="Tasa de Interes" />
+                            <div class="validation-error"><p></p></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group input-group-sm">
+                            <label for="plazo">Plazo</label>
+                            <input type="text" class="form-control numero requerido" id="plazo" attr-message="Es un campo requerido!" name="abreviatura" placeholder="Plazo en Meses"  />
+                            <div class="validation-error"><p></p></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="form-group input-group-sm">
+                            <label for="PagoIntereses">Pago de Intereses</label>
+                            <select class="selectpicker show-menu-arrow requerido " title="Seleccione" attr-message="Es un campo requerido!" id="PagoIntereses" name="PagoIntereses">
+                                <option value="1">MENSUAL</option>
+                                <option value="2">QUINCENAL</option>
+                                @*<option value="3">SEMANAL</option>*@
+                            </select>
+                            <div class="validation-error"><p></p></div>
+                        </div>
+                    </div>
+                </div>
+                @*<div class="row">
+                <div class="col-sm-4">
+                        <div class="form-group input-group-sm">
+                            <label for="TipoCuota">Tipo de Cuota</label>
+                            <select class="selectpicker show-menu-arrow " title="Seleccione" id="TipoCuota" name="TipoCuota">
+                                <option value="1">CUOTA FIJA</option>
+                                <option value="2">DECRECIENTE</option>
+                                <option value="3">VENCIMIENTO</option>
+                            </select>
+                            <div class="validation-error"><p></p></div>
+                        </div>
+                    </div>
+                </div>*@
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="form-group input-group-sm" id="div_descripcion_tipo_razon">
+                            <label for="observaciones">Observaciones</label>
+                            <input type="text" class="form-control varchar200" id="observaciones"  name="observaciones" placeholder="Observacioness" />
+                            <div class="validation-error"><p></p></div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="container" style="background-color: #212F3D; color: white; height: 3.9em;">
+                <h4 style="margin-top: 1em;">Beneficiarios</h4>
+            </div>
+            <br />
+
+            <div id="form_DatosBeneficiarios">
+                <div class="col-sm-5">
+                    <div class="form-group input-group-sm">
+                        <label for="Beneficiario1">Beneficiario N°1</label>
+                        <input type="text" class="form-control varchar200 requerido " id="Beneficiario1" attr-message="Es un campo requerido!"  name="Beneficiario1" placeholder="Nombre de Beneficiario 1"  />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group input-group-sm">
+                        <label for="ID_Bene1">ID</label>
+                        <input type="text" class="form-control varchar20 requerido identidad" id="ID_Bene1" attr-message="Es un campo requerido!"  name="ID_Bene1" />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group input-group-sm">
+                        <label for="Porc_Bene1">Porcentaje %</label>
+                        <input type="text" class="form-control varchar20 requerido monto " id="Porc_Bene1" attr-message="Es un campo requerido!"  name="Porc_Bene1" />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-5">
+                    <div class="form-group input-group-sm">
+                        <label for="Beneficiario2">Beneficiario N°2</label>
+                        <input type="text" class="form-control varchar200 " id="Beneficiario2"  name="Beneficiario2" placeholder="Nombre de Beneficiario 2"  />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group input-group-sm">
+                        <label for="ID_Bene2">ID</label>
+                        <input type="text" class="form-control varchar20 identidad " id="ID_Bene2"  name="ID_Bene2" />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group input-group-sm">
+                        <label for="Porc_Bene2">Porcentaje %</label>
+                        <input type="text" class="form-control varchar20 monto " id="Porc_Bene2"  name="Porc_Bene2" />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-5">
+                    <div class="form-group input-group-sm">
+                        <label for="Beneficiario3">Beneficiario N°3</label>
+                        <input type="text" class="form-control varchar200 " id="Beneficiario3"  name="Beneficiario3" placeholder="Nombre de Beneficiario 3"  />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group input-group-sm">
+                        <label for="ID_Bene3">ID</label>
+                        <input type="text" class="form-control varchar20 identidad" id="ID_Bene3"  name="ID_Bene3" />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group input-group-sm">
+                        <label for="Porc_Bene3">Porcentaje %</label>
+                        <input type="text" class="form-control varchar20 monto " id="Porc_Bene3"  name="Porc_Bene3" />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+            </div>
+            <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+            <div class="container" style="background-color: #212F3D; color: white; height: 3.9em;">
+                <h4 style="margin-top: 1em;">Tipo de Pago</h4>
+
+            </div>
+            <br />
+
+            <div id="form_TipoPagoDeposito">
+                @*<div class="row">*@
+                <div class="col-sm-5">
+                        <div class="form-group input-group-sm">
+                            <select class="selectpicker show-menu-arrow" title="Seleccione" id="TipoPagoDeposito" name="TipoPagoDeposito">
+                                <option value="0">Efectivo</option>
+                                <option value="1">Transferencia</option>
+                            </select>
+                            <div class="validation-error"><p></p></div>
+                        </div>
+                    </div>
+                @*</div>*@
+            </div>
+            <br /><br />
+            
+            <div class="modal-footer">
+                <input type="text" class="form-control hidden" id="Codigo" readonly="readonly" name="Codigo"/>
+                <button type="button" id="btnTransDepositos" class="btn btn-primary">Transacciones</button>
+                <button type="button" id="btnGenerarDeposito" class="btn btn-md btn-success ">Registrar Deposito</button>
+                <button type="button" id="btnCerrrar" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" id="btnGuardar" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div> @*fin modal*@
+
+
+@*TRANSACCIONES DE DEPOSITOS*@
+<div class="modal fade" id="Transacciones_Depositos" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel"><span id="theHeader">Transacciones de Depositos a Plazo</span></h4>
+            </div>
+            <div class="modal-body" id="form">
+                <input type="hidden" id="hidden_id" />
+                <input type="hidden" id="hidden_tipo_id" value="@ViewBag.TipoId" />
+
+                <div class="col-xs-12 bac-table-panel">
+                    <table id="tableCitas" class="list-table table table-bordered">
+                        <thead>
+                            <tr>
+                                 <th>No.</th>
+                                 <th>Fecha de Transaccion</th>
+                                 <th>Deposito</th>
+                                 <th>Retiros</th>
+                                 <th>Intereses</th>
+                                 @*<th>Mora</th>*@
+                                 <th>Usuario Agrego</th>
+                                 <th>Saldo</th>
+                                @*<th>Estado</th>
+                                 <th>Acciones</th>*@
+                                 <th hidden="hidden"></th>
+                             </tr>
+                        </thead>
+                    </table>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnCerrrar" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*<div class="modal fade" id="modalEliminarRazon" role="dialog" aria-labelledby="modalProcesar">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="tituloProcesar"><span id="theHeaderEliminar">Eliminar trámite</span></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div data-alerts="alerts" data-titles="{&quot;success&quot;: &quot;&lt;em&gt;Correcto!&lt;/em&gt;&quot;}" data-ids="successModalEliminarPlantillas" data-fade="5000"></div>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <h5>
+                        <h3><div id="modalmessage" class="alert alert-warnin" role="alert"></div></h3>
+                    </h5>
+
+                </div><!-- /.box-body -->
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-xs-12 text-right">
+                        <button type="button" id="cerrarModalProcesar" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                        <button type="button" id="btnEliminar" class="btn btn-danger">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>*@
+
+@Scripts.Render("~/Scripts/js/Depositos.js")
+@*@Scripts.Render("~/Scripts/js/citas.js")*@
+
+

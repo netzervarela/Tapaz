@@ -1,0 +1,813 @@
+﻿
+@{
+    ViewBag.Title = "Aprobacion_Creditos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<h2>Aprobacion de Créditos</h2>*@
+<div class="box bac">
+    <div class="box-header">
+        <h3 class="titulo">Aprobacion de Créditos</h3>
+        <div class="row nomargin hide">
+            <button class="btn btn-md btn-success" onClick='NuevaCita(event)'>
+                <i class="fa fa-plus"> </i>
+                <span> Nuevo Registro</span>
+            </button>
+        </div>
+    </div>
+    <div class="box-body">
+        <div class="row nomargin">
+            <div class="col-xs-12 text-right">
+                <p style="font-weight: bold;" class="nomargin">@ViewBag.hoyFormat</p>
+                <label for="idsucur" id="idsucur" />
+            </div>
+        </div>
+        <div class="nav-tabs-custom tab-danger">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                @*<li role="presentation" class="active"><a href="#tiempo_centros_atencion" aria-controls="tiempo_centros_atencion" id="btn_centros_atencion" role="tab" data-toggle="tab">Centros de atencion</a></li>*@
+                <li role="presentation" class=""><a href="#inicio" aria-controls="inicio" role="tab" data-toggle="tab" onClick='GetSolicitudesTotal(event)'>Todas las solicitudes</a></li>
+                <li role="presentation" class=""><a href="#inicio" aria-controls="inicio" role="tab" data-toggle="tab">Solicitudes por Cliente</a></li>
+                <li role="presentation" class="hide"><a href="#resultado_busqueda_ninguno" aria-controls="resultado_busqueda_ninguno" role="tab" data-toggle="tab">Solicitudes de Créditos</a></li>
+                <li role="presentation" class="hide"><a href="#resultado_busqueda_encontrado" aria-controls="resultado_busqueda_encontrado" role="tab" data-toggle="tab">Solicitudes de Créditos</a></li>
+                @*<li role="presentation" class="hide"><a href="#ver_cita" aria-controls="ver_cita" role="tab" data-toggle="tab">Solicitudes de Créditos</a></li>*@
+                @*<li role="presentation" class="hide"><a href="#ver_cita" aria-controls="ver_cita" role="tab" data-toggle="tab">Gestión de Solicitudes</a></li>*@
+                <li role="presentation" class="hide"><a href="#nueva_cita" aria-controls="nueva_cita" role="tab" data-toggle="tab">Datos generales</a></li>
+                <li role="presentation" class="hide"><a href="#nueva_cita_calendario" aria-controls="nueva_cita_calendario" role="tab" data-toggle="tab">Asignacion de cita</a></li>
+                <li role="presentation" class="hide"><a href="#nueva_cita_razon" aria-controls="nueva_cita_razon" role="tab" data-toggle="tab">Razon de cancelacion</a></li>
+                <li role="presentation" class="hide"><a href="#vista_previa_cita" aria-controls="vista_previa_cita" role="tab" data-toggle="tab">Confirmacion cita</a></li>
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content bac-table-panelx">
+                <div role="tabpanel" class="tab-pane fade" id="inicio">
+                    <div class="row no-margin">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <div class="form-group input-group custom-search-form input-group-sm">
+                                <input type="text" class="form-control" data-provide="typeahead" id="busqueda" placeholder="Buscar nombre, correo electronico o numero de identidad" autocomplete="off" data-original-title="" title="">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-info" type="button" id="btn_buscarid" name="btn_buscarid">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </span>
+                            </div><!-- /input-group -->
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="resultado_busqueda_ninguno">
+                    <div class="row" style="padding: 15px;">
+                        <div class="col-xs-12 text-center">
+                            <span>Ninguna coincidencia encontrada con </span>
+                            <b>'<span id="texto_busqueda"></span>'</b>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6 text-right">
+                            <button class="btn btn-sm btn-default" id="btn_inicio" onClick='buscarDeNuevo()'>
+                                <span>Buscar de nuevo </span>
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                        @*<div class="col-xs-6 text-left">
+                    <button class="btn btn-sm btn-primary" id="btn_nueva_cita" onClick='nuevaCita()'>
+                        <i class="fa fa-plus"> </i>
+                        <span>Nueva cita</span>
+                    </button>
+                </div>*@
+                    </div>
+                </div>
+
+                <div role="tabpanel" class="tab-pane fade" id="resultado_busqueda_encontrado">
+                    <div class="row bac-container-table-panel">
+                        <div class="col-xs-12 text-center" style="padding-top: 15px;">
+                            <span>Coincidencias para </span>
+                            <b>'<span id="texto_busqueda_encontrado"></span>'</b>
+                        </div>
+                        <div class="col-xs-12 bac-table-panel">
+                            <table id="tableCitas" class="list-table table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Codigo de Cliente</th>
+                                        <th>Identidad</th>
+                                        <th>Cliente</th>
+                                        <th>Garantia del Crédito</th>
+                                        <th>Fecha de Solicitud</th>
+                                        <th>Monto Solicitado</th>
+                                        <th>Plazo</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                        <th hidden="hidden"></th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row" style="margin: 0; margin-top: 20px;">
+                        <div class="col-xs-6 text-right">
+                            <button class="btn btn-sm btn-default" id="btn_inicio" onClick='buscarDeNuevo()'>
+                                <span>Buscar de nuevo </span>
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                        @*<div class="col-xs-6 text-left">
+                    <button class="btn btn-sm btn-primary" id="btn_nueva_cita" onClick='nuevaCita()'>
+                        <i class="fa fa-plus"> </i>
+                        <span>Nueva cita</span>
+                    </button>
+                </div>*@
+                    </div>
+                </div>
+
+                @*<div role="tabpanel" class="tab-pane fade" id="ver_cita">*@
+               
+                <!-- Modal -->
+                <div class="modal fade" id="ver_cita" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="myModalLabel"><span id="theHeader">Gestión de Solicitudes</span></h4>
+                            </div>
+                            <div class="modal-body" id="form">
+                                <input type="hidden" id="hidden_id" />
+                                <input type="hidden" id="hidden_tipo_id" value="@ViewBag.TipoId" />
+
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group input-group-sm">
+                                            <label for="CodPres">Código del Préstamo</label>
+                                            <input type="text" class="form-control" id="CodPres" name="CodPres" readonly="readonly">
+                                            <div class="validation-error"><p></p></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <div class="form-group input-group-sm">
+                                            <label for="identidad">Identidad del Cliente</label>
+                                            <input type="text" class="form-control" id="identidad" name="identidad" readonly="readonly">
+                                            <div class="validation-error"><p></p></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group input-group-sm">
+                                            <label for="FecSolicitud">Fecha de Solicitud</label>
+                                            <input type="text" class="form-control" id="FecSolicitud" name="FecSolicitud" readonly="readonly">
+                                            <div class="validation-error"><p></p></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <div class="form-group input-group-sm">
+                                            <label for="CliNom">Nombre Del Cliente</label>
+                                            <input type="text" class="form-control" id="CliNom" name="CliNom" readonly="readonly">
+                                            <div class="validation-error"><p></p></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group input-group-sm">
+                                            <label for="montosolicitado">Monto Solicitado</label>
+                                            <input type="text" class="form-control monto requerido monto" id="montosolicitado" attr-message="Es un campo requerido!" name="montosolicitado" placeholder="Monto en Lempiras" />
+                                            <div class="validation-error"><p></p></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group input-group-sm">
+                                            <label for="plazo">Plazo</label>
+                                            <input type="text" class="form-control numero requerido" id="plazo" attr-message="Es un campo requerido!" name="abreviatura" placeholder="Plazo en Meses" />
+                                            <div class="validation-error"><p></p></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group input-group-sm">
+                                            <label for="garantia">Garantia</label>
+                                            <select class="selectpicker show-menu-arrow " title="Seleccione" id="garantia" name="garantia">
+                                                <option value="1" id="hipotecaria" >HIPOTECARIA</option>
+                                                <option value="2" id="automatica" >AUTOMATICA</option>
+                                                <option value="3" id="fiduciaria" >FIDUCIARIA</option>
+                                            </select>
+                                            <div class="validation-error"><p></p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group input-group-sm">
+                                            <label for="tasainteres">Tasa de Interes</label>
+                                            <input type="text" class="form-control requerido monto" id="tasainteres" attr-message="Es un campo requerido!" name="tasainteres" placeholder="Tasa de Interes" />
+                                            <div class="validation-error"><p></p></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group input-group-sm">
+                                            <label for="destino">Destino</label>
+                                            <select class="selectpicker show-menu-arrow " title="Seleccione" id="destino" name="destino">
+                                                <option value="1" id="consumo">CONSUMO</option>
+                                                <option value="2" id="vivienda">VIVIENDA</option>
+                                                <option value="3" id="automovil">AUTOMOVIL</option>
+                                                <option value="4" id="inversion">INVERSION</option>
+                                            </select>
+                                            <div class="validation-error"><p></p></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group input-group-sm">
+                                            <label for="frecuenciapago">Frecuencia de Pago</label>
+                                            <select class="selectpicker show-menu-arrow " title="Seleccione" id="frecuenciapago" name="frecuenciapago">
+                                                <option value="1" id="mensual">MENSUAL</option>
+                                                <option value="2" id="quincenal">QUINCENAL</option>
+                                                <option value="3" id="semanal">SEMANAL</option>
+                                            </select>
+                                            <div class="validation-error"><p></p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group input-group-sm">
+                                 <label for="TipoCuota">Tipo de Cuota</label>
+                                 <select class="selectpicker show-menu-arrow " title="Seleccione" id="TipoCuota" name="TipoCuota">
+                                       <option value="1" id="CUOTA FIJA">CUOTA FIJA</option>
+                                       <option value="2" id="DECRECIENTE">DECRECIENTE</option>
+                                       <option value="3" id="VENCIMIENTO">VENCIMIENTO</option>
+                                 </select>
+                             <div class="validation-error"><p></p></div>
+                               </div>
+                          </div>
+                          </div>
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <div class="form-group input-group-sm" id="div_descripcion_tipo_razon">
+                                            <label for="observaciones">Observaciones</label>
+                                            <input type="text" class="form-control varchar200 requerido " id="observaciones" attr-message="Es un campo requerido!" name="observaciones" placeholder="Observacioness" />
+                                            <div class="validation-error"><p></p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="container" style="background-color: #212F3D; color: white; height: 3.9em;">
+                                <h4 style="margin-top: 1em;">Estudio Socioecnómico</h4>
+                            </div>
+                            <br />
+
+                            <div id="form_DatosSocioEconomico">
+                                <div class="col-sm-12">
+                                    <div class="form-group input-group-sm">
+                                        <label for="Personas">¿Número de Presonas Que Dependen Económicamente de Usted?</label>
+                                        <input type="text" class="form-control requerido numero" id="Personas" attr-message="Es un campo requerido!" name="Personas" placeholder="Número de Personas" />
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="container" style="background-color: #212F3D; color: white; height: 3.9em;">
+                                <h4 style="margin-top: 1em;">Ingresos Mensuales</h4>
+                            </div>
+                            <br />
+
+                            <div id="form_IngresosMensuales">
+                                <div class="col-sm-6">
+                                    <div class="form-group input-group-sm">
+                                        <label for="NegocioPropio">Negocio Propio</label>
+                                        <input type="text" class="form-control monto requerido" id="NegocioPropio" attr-message="Es un campo requerido!" name="NegocioPropio" placeholder="Total en Lempiras" />
+                                        <div class="validation-error"><p id="prueba_mensaje"></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group input-group-sm">
+                                        <label for="Salario">Salario</label>
+                                        <input type="text" class="form-control monto requerido" id="Salario" attr-message="Es un campo requerido!" name="Salario" placeholder="Total en Lempiras" />
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group input-group-sm">
+                                        <label for="Finca">Finca o Actividad Agropecuaria</label>
+                                        <input type="text" class="form-control monto requerido" id="Finca" attr-message="Es un campo requerido!" name="Finca" placeholder="Total en Lempiras" />
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group input-group-sm">
+                                        <label for="Otros">Otros</label>
+                                        <input type="text" class="form-control monto requerido" id="Otros" attr-message="Es un campo requerido!" name="Otros" placeholder="Total en Lempiras" />
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group input-group-sm">
+                                        <label for="TotalIngreso">Total Ingreso Mensual</label>
+                                        <input type="text" class="form-control monto requerido" id="TotalIngreso" attr-message="Es un campo requerido!" name="TotalIngreso" placeholder="Total en Lempiras" readonly="readonly">
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="container" style="background-color: #212F3D; color: white; height: 3.9em;">
+                                <h4 style="margin-top: 1em;">Egresos Mensuales</h4>
+                            </div>
+                            <br />
+
+                            <div id="form_EgresosMensuales">
+                                <div class="col-sm-6">
+                                    <div class="form-group input-group-sm">
+                                        <label for="Renta">Renta</label>
+                                        <input type="text" class="form-control monto requerido " id="Renta" attr-message="Es un campo requerido!" name="Renta" placeholder="Total en Lempiras" value="0" />
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group input-group-sm">
+                                        <label for="Servicios">Servicios Públicos</label>
+                                        <input type="text" class="form-control monto requerido " id="Servicios" attr-message="Es un campo requerido!" name="Servicios" placeholder="Total en Lempiras" value="0" />
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group input-group-sm">
+                                        <label for="Prestamos">Préstamos</label>
+                                        <input type="text" class="form-control monto requerido " id="Prestamos" attr-message="Es un campo requerido!" name="Prestamos" placeholder="Total en Lempiras" value="0" />
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group input-group-sm">
+                                        <label for="Transporte">Transporte</label>
+                                        <input type="text" class="form-control monto requerido " id="Transporte" attr-message="Es un campo requerido!" name="Transporte" placeholder="Total en Lempiras" value="0" />
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group input-group-sm">
+                                        <label for="Alimentacion">Alimentación</label>
+                                        <input type="text" class="form-control monto requerido " id="Alimentacion" attr-message="Es un campo requerido!" name="Alimentacion" placeholder="Total en Lempiras" value="0" />
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group input-group-sm">
+                                        <label for="Vestuario">Vestuario</label>
+                                        <input type="text" class="form-control monto requerido " id="Vestuario" attr-message="Es un campo requerido!" name="Vestuario" placeholder="Total en Lempiras" value="0" />
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group input-group-sm">
+                                        <label for="Otros1">Otros</label>
+                                        <input type="text" class="form-control monto requerido " id="Otros1" attr-message="Es un campo requerido!" name="Otros1" placeholder="Total en Lempiras" value="0" />
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group input-group-sm">
+                                        <label for="Egresos">Total Egresos</label>
+                                        <input type="text" class="form-control monto requerido " id="Egresos" attr-message="Es un campo requerido!" name="Egresos" placeholder="Total en Lempiras" readonly="readonly">
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group input-group-sm">
+                                        <label for="CapPago">Capacidad de Pago</label>
+                                        <input type="text" class="form-control monto requerido " id="CapPago" attr-message="Es un campo requerido!" name="CapPago" placeholder="Total en Lempiras" readonly="readonly">
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group input-group-sm">
+                                        <label for="Observaciones1">Observaciones</label>
+                                        <input type="text" class="form-control varchar200 requerido " id="Observaciones1" attr-message="Es un campo requerido!" name="Observaciones" placeholder="Observaciones" />
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" id="btnAvales" class="btn btn-primary btn-success">Avales</button>
+                                <button type="button" id="btnAprobar" class="btn btn-primary">Aprobar</button>
+                                <button type="button" id="btnRechazar" class="btn btn-primary">Rechazar</button>
+                                <button type="button" id="btnGuardar" class="btn btn-primary">Guardar</button>
+                                <button type="button" id="btnCerrrar" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div> @*fin modal*@
+
+<!-- Modal -->
+<div class="modal fade" id="Modal_Avales" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel"><span id="theHeader">Avales</span></h4>
+            </div>
+            <div class="modal-body">
+                @*PRIMERA REFERENCIA PERSONAL*@
+            <div class="container" style="background-color: #212F3D; color: white; height: 3.9em;">
+                <h4 style="margin-top: 1em;">Primer Aval</h4>
+            </div>
+            <br />
+
+            <div>
+                <div class="col-sm-6">
+                    <div class="form-group input-group-sm">
+                        <label for="NomRef1">Nombre Completo</label>
+                        <input type="text" class="form-control varchar50 requerido" id="NomRef1" attr-message="Es un campo requerido!" name="NomRef1" />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group input-group-sm">
+                        <label for="IdRef1">Identidad</label>
+                        <input type="text" class="form-control identidad requerido" id="IdRef1" attr-message="Es un campo requerido!" name="IdRef1"  />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group input-group-sm">
+                        <label for="CelRef1">Celular</label>
+                        <input type="text" class="form-control telefonoCelular requerido" id="CelRef1" attr-message="Es un campo requerido!" name="CelRef1"  />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group input-group-sm">
+                        <label for="TelRef1">Teléfono Fijo</label>
+                        <input type="text" class="form-control telefonoCelular" id="TelRef1" name="TelRef1"  />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group input-group-sm">
+                        <label for="TelRef1">Dirección</label>
+                        <input type="text" class="form-control telefonoCelular" id="TelRef1" name="TelRef1" />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+
+             @* IMPUT HIDDEN PARA NUMERO DE REFERENCIA UNO *@
+                <input type="text" class="form-control varchar50 hidden" id="NumRef1" name="NumRef1"/>
+
+            </div>
+            <br />@*<br /><br /><br /><br /><br /><br /><br />*@
+
+
+            @*SEGUNDA REFERENCIA PERSONAL*@
+            <div class="container" style="background-color: #212F3D; color: white; height: 3.9em;">
+                <h4 style="margin-top: 1em;">Segundo Aval </h4>
+            </div>
+            <br />
+
+            <div>
+                <div class="col-sm-6">
+                    <div class="form-group input-group-sm">
+                        <label for="NomRef2">Nombre Completo</label>
+                        <input type="text" class="form-control varchar50 requerido" id="NomRef2" attr-message="Es un campo requerido!" name="NomRef2"  />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group input-group-sm">
+                        <label for="IdRef2">Identidad</label>
+                        <input type="text" class="form-control identidad requerido" id="IdRef2" attr-message="Es un campo requerido!" name="IdRef2" />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group input-group-sm">
+                        <label for="CelRef2">Celular</label>
+                        <input type="text" class="form-control telefonoCelular requerido" id="CelRef2" attr-message="Es un campo requerido!" name="CelRef2" />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group input-group-sm">
+                        <label for="TelRef2">Teléfono Fijo</label>
+                        <input type="text" class="form-control telefonoCelular" id="TelRef2" name="TelRef2"  />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group input-group-sm">
+                        <label for="TelRef2">Dirección</label>
+                        <input type="text" class="form-control telefonoCelular" id="TelRef2" name="TelRef2" />
+                        <div class="validation-error"><p></p></div>
+                    </div>
+                </div>
+            </div>
+
+             @* IMPUT HIDDEN PARA NUMERO DE REFERENCIA DOS *@
+            <input type="text" class="form-control varchar50 hidden" id="NumRef2" name="NumRef2"/>
+            <br />@*<br /><br /><br /><br /><br /><br />*@
+
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnCerrrar" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" id="btnGuardarDia" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+                @*INICIO MODAL VIEJO*@
+                @*<div class="modal fade" id="ver_cita" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel"><span id="theHeader">Gestión de Solicitudes</span></h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="hidden_id" />
+                    <div id="form">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group input-group-sm">
+                                    <label for="txt_identificacion">Identidad</label>
+                                    <input type="text" class="form-control varchar50" id="txt_identificacion" name="txt_identificacion" />
+                                    <div class="validation-error"><p></p></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group input-group-sm">
+                                    <label for="txt_nombre">Cliente</label>
+                                    <input type="text" class="form-control varchar50" id="txt_nombre" name="txt_nombre" />
+                                    <div class="validation-error"><p></p></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group input-group-sm">
+                                    <label for="txt_garantia">Garantia</label>
+                                    <input type="text" class="form-control varchar50" id="txt_garantia" name="txt_garantia" />
+                                    <div class="validation-error"><p></p></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="form-group input-group-sm">
+                                    <label for="txt_prestamo">Prestamo</label>
+                                    <input type="text" class="form-control varchar50" id="txt_prestamo" name="txt_prestamo" />
+                                    <div class="validation-error"><p></p></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="form-group input-group-sm">
+                                    <label for="txt_plazo">Plazo</label>
+                                    <input type="text" class="form-control varchar50" id="txt_plazo" name="txt_plazo" />
+                                    <div class="validation-error"><p></p></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group input-group-sm">
+                                    <label for="txt_fecha">Fecha de Solicitud</label>
+                                    <input type="text" class="form-control varchar50" id="txt_fecha" name="txt_fecha" />
+                                    <div class="validation-error"><p></p></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group input-group-sm">
+                                    <label for="txt_monto_sol">Monto Solicitado</label>
+                                    <input type="text" class="form-control varchar50" id="txt_monto_sol" name="txt_monto_sol" />
+                                    <div class="validation-error"><p></p></div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <div class="form-group input-group-sm">
+                                    <label for="txt_observacion">Observaciones</label>
+                                    <textarea class="form-control varchar100" id="txt_observacion" name="txt_observacion" maxlength="600" align="left" style="height:100px; width:100%; resize: none;"></textarea>
+                                    <div class="validation-error"><p></p></div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12">
+                                <div class="form-group input-group-sm">
+                                    <label for="txt_observacion">Identidad referencia 1 </label>
+                                    <textarea class="form-control varchar100" id="txt_ref1" name="txt_observacion" maxlength="600" align="left" style="height:100px; width:100%; resize: none;"></textarea>
+                                    <div class="validation-error"><p></p></div>
+                                </div>
+                            </div>
+
+
+                            <div class="row no-margin hidden" id="div_listado_extra">
+                                <h3>Listado extra</h3>
+                                <div class="col-sm-6">
+                                    <div class="form-group input-group-sm">
+                                        <label for="etiqueta">Etiqueta</label>
+                                        <input type="text" class="form-control varchar50" attr-message="Es un campo requerido!" id="etiqueta" name="etiqueta" />
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group input-group-sm">
+                                        <label for="origen">Origen</label>
+                                        <input type="text" class="form-control varchar10" attr-message="Es un campo requerido!" id="origen" name="origen" />
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group input-group-sm">
+                                        <label for="codigo_listado">Codigo</label>
+                                        <input type="text" class="form-control varchar10" attr-message="Es un campo requerido!" id="codigo_listado" name="codigo_listado" />
+                                        <div class="validation-error"><p></p></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="btnAvales" class="btn btn-primary btn-success">Avales</button>
+                        <button type="button" id="btnAprobar" class="btn btn-primary">Aprobar</button>
+                        <button type="button" id="btnRechazar" class="btn btn-primary">Rechazar</button>
+                        <button type="button" id="btnGuardar" class="btn btn-primary">Guardar</button>
+                        <button type="button" id="btnCerrrar" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    </div>*@@*FIN MODAL VIEJO*@
+                </div>
+    </div>
+</div>
+                    @*<div class="row nomargin" style="margin-top: 20px !important;">
+                        <button class="btn btn-md btn-default" onClick='buscarDeNuevo()'>
+                            <span> Buscar de nuevo </span>
+                            <i class="fa fa-search"> </i>
+                        </button>
+                        <button class="btn btn-md btn-primary hidden" onClick='verResultado()'>
+                            <span> Ver Resultados </span>
+                            <i class="fa fa-search"> </i>
+                        </button>
+                        <button class="btn btn-md btn-success btn_notificar_cita" id="btn_notificar_cita">
+                            <span> Notificar cita </span>
+                            <i class="fa fa-envelope"> </i>
+                        </button>
+                    </div>*@
+                </div>
+
+                
+                <div role="tabpanel" class="tab-pane fade" id="nueva_cita_calendario">
+                    <div class="row text-center">
+                        <div class="col-xs-12" style="padding: 15px;" id="fecha_cita_alert">
+                        </div>
+                    </div>
+                    <div class="row nomargin">
+                        <div id="div_cubiculos"></div>
+                    </div>
+                    <div class="row nomargin" id="recargarcalendario">
+                        <div class="col-xs-12">
+                            <section id="alertasCalendario">
+                                <div class="col-md-12">
+                                    <div data-alerts="alerts" data-titles="{&quot;danger&quot;: &quot;&lt;em&gt;Cita no puede ser programada!&lt;/em&gt;&quot;}" data-ids="errorCalendario" data-fade="5000"></div>
+                                    <div data-alerts="alerts" data-titles="{&quot;success&quot;: &quot;&lt;em&gt;Correcto!&lt;/em&gt;&quot;}" data-ids="successCalendario" data-fade="5000" id="recalendar"></div>
+                                </div>
+                            </section>
+                            <div id="calendar" class="calendar calendar-container"></div>
+                        </div>
+                    </div>
+                    <div class="row nomargin" style="margin-top: 20px !important;">
+                        <div class="col-sm-3 col-md-3 col-lg-2">
+                            <button class="btn btn-md btn-default" onClick='buscarDeNuevo()'>
+                                <span> Buscar de nuevo </span>
+                                <i class="fa fa-search"> </i>
+                            </button>
+                        </div>
+                        <div class="col-sm-3 col-md-3 col-lg-2">
+                            <button class="btn btn-md btn-primary hidden" onClick='verResultado()'>
+                                <span> Ver Resultados </span>
+                                <i class="fa fa-search"> </i>
+                            </button>
+                        </div>
+                        <div class="col-sm-6 col-md-6 col-lg-8 text-right">
+                            <button class="btn btn-md btn-warning" onClick='activarTab("nueva_cita_razon")' onClick="GuardarCita()" title='Asignar razon de cancelacion' data-toggle='tooltip' data-placement='top'>
+                                <i class="fa fa-arrow-left"> </i>
+                                <span> Anterior</span>
+                            </button>
+                            <button class="btn btn-md btn-success" id="programarCita" onClick="GuardarCita()" title='Programar cita' data-toggle='tooltip' data-placement='top'>
+                                <i class="fa fa-calendar"> </i>
+                                <span> Siguiente</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div role="tabpanel" class="tab-pane fade" id="vista_previa_cita">
+                    <div class="row no-margin">
+                        <div class="col-xs-12">
+                            <div class="form-group input-group-sm" id="div_identificacion">
+                                <label for="txt_identificacion_vp">Identificacion</label>
+                                <input type="text" class="form-control id limpiar input requerido" id="txt_identificacion_vp" name="txt_identificacion" placeholder="N/D" maxlength="50" autocomplete="off" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-margin">
+                        <div class="col-xs-12">
+                            <div class="form-group input-group-sm" id="div_nombre">
+                                <label for="txt_nombre_vp">Nombre</label>
+                                <input type="text" class="form-control nombre limpiar input requerido" id="txt_nombre_vp" name="txt_nombre" placeholder="N/D" maxlength="50" autocomplete="off" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-margin">
+                        <div class="col-xs-12">
+                            <div class="form-group input-group-sm" id="div_email">
+                                <label for="txt_email_vp">Email</label>
+                                <input type="text" class="form-control nombre limpiar input requerido" id="txt_email_vp" name="txt_email" placeholder="N/D" maxlength="50" autocomplete="off" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-margin">
+                        <div class="col-xs-6">
+                            <div class="form-group input-group-sm" id="div_cel">
+                                <label for="txt_cel_vp">Celular</label>
+                                <input type="text" class="form-control telefono limpiar input requerido" id="txt_cel_vp" name="txt_cel" placeholder="N/D" maxlength="50" autocomplete="off" disabled>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="form-group input-group-sm" id="div_tarjeta">
+                                <label for="txt_tel_oficina_vp">Tel. Oficina</label>
+                                <input type="text" class="form-control telefono limpiar input requerido" id="txt_tel_oficina_vp" name="txt_tel_oficina" placeholder="N/D" maxlength="50" autocomplete="off" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-margin">
+                        <div class="col-xs-6">
+                            <div class="form-group input-group-sm" id="div_tel_casa">
+                                <label for="txt_tel_casa_vp">Tel. Casa</label>
+                                <input type="text" class="form-control telefono limpiar input requerido" id="txt_tel_casa_vp" name="txt_tel_casa" placeholder="N/D" maxlength="50" autocomplete="off" disabled>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="form-group input-group-sm" id="div_tramite">
+                                <label for="txt_tramite_vp">Tramite</label>
+                                <input type="text" class="form-control nombre limpiar input requerido" id="txt_tramite_vp" name="txt_tramite" placeholder="N/D" maxlength="50" autocomplete="off" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-margin">
+                        <div class="col-xs-6">
+                            <div class="form-group input-group-sm" id="div_cel">
+                                <label for="txt_cuenta_vp">No. Cuenta</label>
+                                <input type="text" class="form-control nombre limpiar input requerido" id="txt_cuenta_vp" name="txt_cuenta" placeholder="N/D" maxlength="50" autocomplete="off" disabled>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="form-group input-group-sm" id="div_tarjeta">
+                                <label for="txt_tarjeta_vp">No. Tarjeta</label>
+                                <input type="text" class="form-control nombre limpiar input cuenta requerido" id="txt_tarjeta_vp" name="txt_tarjeta" placeholder="N/D" maxlength="50" autocomplete="off" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-margin">
+                        <div class="col-xs-6">
+                            <div class="form-group input-group-sm" id="div_sucursal">
+                                <label for="txt_sucursal_vp">Centro de fidelizacion</label>
+                                <input type="text" class="form-control nombre limpiar input requerido" id="txt_sucursal_vp" name="txt_sucursal" placeholder="N/D" maxlength="50" autocomplete="off" disabled>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="form-group input-group-sm" id="div_segmento">
+                                <label for="txt_segmento_vp">Segmento</label>
+                                <input type="text" class="form-control nombre limpiar input requerido" id="txt_segmento_vp" name="txt_segmento" placeholder="N/D" maxlength="50" autocomplete="off" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row no-margin">
+                        <div class="col-xs-6">
+                            <div class="form-group input-group-sm" id="div_fech">
+                                <label for="txt_fecha_vp">Fecha</label>
+                                <input type="text" class="form-control nombre limpiar input requerido" id="txt_fecha_vp" name="txt_fecha" placeholder="N/D" maxlength="50" autocomplete="off" disabled>
+                            </div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="form-group input-group-sm" id="div_hora">
+                                <label for="txt_hora_vp">Hora</label>
+                                <input type="text" class="form-control nombre limpiar input requerido" id="txt_hora_vp" name="txt_hora_vista" placeholder="N/D" maxlength="50" autocomplete="off" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row nomargin" style="margin-top: 20px !important;">
+                        <div class="col-sm-6 col-md-6 col-lg-4 text-left">
+                            <button class="btn btn-md btn-default" onClick='buscarDeNuevo()'>
+                                <span> Buscar de nuevo </span>
+                                <i class="fa fa-search"> </i>
+                            </button>
+                        </div>
+
+                        <div class="col-sm-6 col-md-6 col-lg-8 text-right">
+                            <button class="btn btn-md btn-warning" onClick='asignarCita(0)' title='Asignar cita' data-toggle='tooltip' data-placement='top'>
+                                <i class="fa fa-arrow-left"> </i>
+                                <span> Anterior</span>
+                            </button>
+
+                            <button class="btn btn-md btn-success" id="btnNotificarCita" title='Notificar al cliente' data-toggle='tooltip' data-placement='top'>
+                                <i class="fa fa-envelope-o"> </i>
+                                <span> Finalizar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+@Scripts.Render("~/Scripts/js/citas.js")
