@@ -3,8 +3,9 @@
     "",
     "\\Sistema Financiero",
     "\\Sistema Financiero\\appcitas",
-    "\\Sistema Financiero\\appcitas\\Views\\Home"
+    "\\Sistema Financiero\\appcitas\\Scripts",
+    "\\Sistema Financiero\\appcitas\\Scripts\\js"
   ],
-  "SelectedNode": "\\Sistema Financiero\\appcitas.sln",
+  "SelectedNode": "\\Sistema Financiero\\appcitas\\Scripts\\js\\DPFCaja.js",
   "PreviewInSolutionExplorer": false
 }
